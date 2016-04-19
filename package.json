@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.3.3",
     "express": "^4.13.4",
     "nodemon": "^1.9.1",
     "babel-cli": "^6.4.5",
