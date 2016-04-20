@@ -4,11 +4,9 @@ var app = express();
 var http = require('http').Server(app);
 var routes = require('./routes/queue');
 var io = require('socket.io')(http);
+var sqs = require('./lib/sqs');
 
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
 app.use(bodyParser.json())
 
 app.get('/', function (req, res) {
@@ -27,3 +25,31 @@ io.on('connection', function(socket){
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
+
+var queueUrl;
+sqs.getQueue(function(e, body) {
+    if (e) {
+        return e;
+    };
+
+    queueUrl = body.QueueUrl;
+});
+
+setInterval(function () {
+    sqs.receiveMessage(queueUrl, function(e, body) {
+        if (e) {
+            console.log(e);
+        };
+        var receiptHandles = [];
+        if (body.Messages && body.Messages.length > 0) {
+            for (var i = 0; i < body.Messages.length; i++) {
+                receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
+            }
+        }
+        if (receiptHandles.length > 0) {
+            sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
+                console.log("Deletion of " + body.Successful.length + " succeeded, " + body.Failed.length + " failed");
+            });
+        }
+    });
+}, 5000);

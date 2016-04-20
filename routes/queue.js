@@ -16,7 +16,17 @@ router.get('/', function(req, res) {
         if (e) {
             return res.sendStatus(500);
         };
-
+        var receiptHandles = [];
+        if (body.Messages && body.Messages.length > 0) {
+            for (var i = 0; i < body.Messages.length; i++) {
+                receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
+            }
+        }
+        if (receiptHandles.length > 0) {
+            sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
+                console.log("Deletion of " + body.Successful.length + " succeeded, " + body.Failed.length + " failed");
+            });
+        }
         return res.json(body);
     });
 });
