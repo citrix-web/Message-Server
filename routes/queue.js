@@ -14,7 +14,7 @@ sqs.getQueue(function(e, body) {
 router.get('/', function(req, res) {
     sqs.receiveMessage(queueUrl, function(e, body) {
         if (e) {
-            return res.statusCode(e.statusCode);
+            return res.sendStatus(500);
         };
 
         return res.json(body);
@@ -23,9 +23,10 @@ router.get('/', function(req, res) {
 
 router.put('/', function(req, res) {
     var message = req.body.message;
-    sqs.sendMessage(message, queueUrl, function(e, body) {
+    var messageAttributes = req.body.messageAttributes;
+    sqs.sendMessage(message, messageAttributes, queueUrl, function(e, body) {
         if (e) {
-            return res.statusCode(e.statusCode);
+            return res.sendStatus(500);
         };
 
         return res.json(body);
