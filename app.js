@@ -5,6 +5,7 @@ var http = require('http').Server(app);
 var routes = require('./routes/queue');
 var io = require('socket.io')(http);
 var sqs = require('./lib/sqs');
+require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -15,12 +16,7 @@ app.get('/', function (req, res) {
 
 app.use('/queue', routes);
 
-io.on('connection', function(socket){
-  console.log('a user connected');
-  socket.on('join', function(data) {
-        console.log(data);
-    });
-});
+
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
@@ -35,21 +31,35 @@ sqs.getQueue(function(e, body) {
     queueUrl = body.QueueUrl;
 });
 
-setInterval(function () {
-    sqs.receiveMessage(queueUrl, function(e, body) {
-        if (e) {
-            console.log(e);
-        };
-        var receiptHandles = [];
-        if (body.Messages && body.Messages.length > 0) {
-            for (var i = 0; i < body.Messages.length; i++) {
-                receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
-            }
-        }
-        if (receiptHandles.length > 0) {
-            sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
-                console.log("Deletion of " + body.Successful.length + " succeeded, " + body.Failed.length + " failed");
-            });
-        }
-    });
-}, 5000);
+io.on('connection', function(socket){
+  console.log('a user connected');
+
+  setInterval(function () {
+      sqs.receiveMessage(queueUrl, function(e, body) {
+          if (e) {
+              console.log(e);
+          };
+          console.log('body', body);
+          var receiptHandles = [];
+          if (body.Messages && body.Messages.length > 0) {
+              for (var i = 0; i < body.Messages.length; i++) {
+                  receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
+              }
+              console.log('receiving..');
+              io.emit('messages', body.Messages);
+          }
+          if (receiptHandles.length > 0) {
+              sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
+                if(body.Successful){
+                  console.log("Deletion of " + body.Successful.length + " succeeded, ");
+                }
+                if(body.Failed) {
+                  console.log("Deletion of " + body.Failed.length + " failed");
+                }
+              });
+          }
+
+        });
+  }, 5000);
+
+});
