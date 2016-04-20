@@ -1,7 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+var http = require('http').Server(app);
 var routes = require('./routes/queue');
+var io = require('socket.io')(http);
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -15,6 +17,13 @@ app.get('/', function (req, res) {
 
 app.use('/queue', routes);
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('join', function(data) {
+        console.log(data);
+    });
+});
+
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });
