@@ -6,7 +6,7 @@ var routes = require('./routes/queue');
 var io = require('socket.io')(http);
 var sqs = require('./lib/sqs');
 var user = require('./routes/user');
-
+import dynamo from './lib/dynamo';
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -41,13 +41,12 @@ io.on('connection', function(socket){
           if (e) {
               console.log(e);
           };
-          console.log('body', body);
           var receiptHandles = [];
           if (body.Messages && body.Messages.length > 0) {
               for (var i = 0; i < body.Messages.length; i++) {
                   receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
+                  dynamo.putMessage(body.Messages[i])
               }
-              console.log('receiving..');
               io.emit('messages', body.Messages);
           }
           if (receiptHandles.length > 0) {

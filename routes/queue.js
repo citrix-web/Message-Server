@@ -36,6 +36,7 @@ router.put('/', function(req, res) {
     var messageAttributes = req.body.messageAttributes;
     sqs.sendMessage(message, messageAttributes, queueUrl, function(e, body) {
         if (e) {
+          console.log(e);
             return res.sendStatus(500);
         };
 
