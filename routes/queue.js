@@ -32,11 +32,10 @@ router.get('/', function(req, res) {
 });
 
 router.put('/', function(req, res) {
-    var message = req.body.message;
-    var messageAttributes = req.body.messageAttributes;
-    sqs.sendMessage(message, messageAttributes, queueUrl, function(e, body) {
+
+    sqs.sendMessage(req.body, queueUrl, function(e, body) {
         if (e) {
-          console.log(e);
+          //console.log(e)
             return res.sendStatus(500);
         };
 
