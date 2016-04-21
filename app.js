@@ -12,10 +12,10 @@ require('events').EventEmitter.defaultMaxListeners = Infinity;
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+app.all('*', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
 
@@ -58,14 +58,14 @@ io.on('connection', function(socket){
               io.emit('messages', body.Messages);
           }
           if (receiptHandles.length > 0) {
-              sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
-                if(body.Successful){
-                  console.log("Deletion of " + body.Successful.length + " succeeded, ");
-                }
-                if(body.Failed) {
-                  console.log("Deletion of " + body.Failed.length + " failed");
-                }
-              });
+              // sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
+              //   if(body.Successful){
+              //     console.log("Deletion of " + body.Successful.length + " succeeded, ");
+              //   }
+              //   if(body.Failed) {
+              //     console.log("Deletion of " + body.Failed.length + " failed");
+              //   }
+              // });
           }
 
         });
