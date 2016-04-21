@@ -7,6 +7,8 @@ var io = require('socket.io')(http);
 var sqs = require('./lib/sqs');
 var user = require('./routes/user');
 var dynamo = require('./lib/dynamo');
+var messages = require('./routes/messages');
+
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -24,7 +26,7 @@ app.get('/', function (req, res) {
 });
 
 app.use('/queue', routes);
-app.use('/api', user)
+app.use('/api', user, messages)
 
 
 http.listen(3000, function(){
