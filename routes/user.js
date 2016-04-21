@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-import dynamo from '../lib/dynamo';
+var dynamo = require('../lib/dynamo');
 
 
 
@@ -15,7 +15,6 @@ router.put('/user/:userId/read', function(req, res) {
 
 router.get('/user/:userId/read', function(req, res) {
     dynamo.getUserRead(req.params.userId).then((result) => {
-      console.log('m', result)
       return res.send(result);
     }).catch((err) => {
       res.send(err)

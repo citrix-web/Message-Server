@@ -32,7 +32,6 @@ router.get('/', function(req, res) {
 });
 
 router.put('/', function(req, res) {
-    console.log('hello put', req.body)
     sqs.sendMessage(req.body, queueUrl, function(e, body) {
         if (e) {
           //console.log(e)
