@@ -59,13 +59,13 @@ io.on('connection', function(socket){
               }
           }
           if (receiptHandles.length > 0) {
-              sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
-                if(body.Successful) {
+              sqs.deleteMessages(receiptHandles, queueUrl, function(e, delBody) {
+                if(delBody.Successful) {
                   io.emit('messages', body.Messages);
-                  console.log("Deletion of " + body.Successful.length + " succeeded, ");
+                  console.log("Deletion of " + delBody.Successful.length + " succeeded, ");
                 }
-                if(body.Failed) {
-                  console.log("Deletion of " + body.Failed.length + " failed");
+                if(delBody.Failed) {
+                  console.log("Deletion of " + delBody.Failed.length + " failed");
                 }
               });
           }
