@@ -37,6 +37,7 @@ router.put('/', function(req, res) {
           //console.log(e)
             return res.sendStatus(500);
         };
+        console.log('put', body)
 
         return res.json(body);
     });

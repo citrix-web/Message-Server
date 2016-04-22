@@ -50,18 +50,21 @@ io.on('connection', function(socket){
           if (e) {
               console.log(e);
           };
+
           var receiptHandles = [];
           if (body.Messages && body.Messages.length > 0) {
               for (var i = 0; i < body.Messages.length; i++) {
                   receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
-                  console.log('body', body.Messages[i].Body)
-                  dynamo.putMessage(body.Messages[i], body.Messages[i].MessageAttributes)
+                  console.log('body', body.Messages[i].Body);
+                  dynamo.putMessage(body.Messages[i]);
+                  io.emit('messages', body.Messages[i]);
               }
+
           }
           if (receiptHandles.length > 0) {
+            console.log('delete')
               sqs.deleteMessages(receiptHandles, queueUrl, function(e, delBody) {
                 if(delBody.Successful) {
-                  io.emit('messages', body.Messages);
                   console.log("Deletion of " + delBody.Successful.length + " succeeded, ");
                 }
                 if(delBody.Failed) {
@@ -70,6 +73,6 @@ io.on('connection', function(socket){
               });
           }
         });
-  }, 1500);
+  }, 5000);
 
 });
