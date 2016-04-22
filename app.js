@@ -57,11 +57,11 @@ io.on('connection', function(socket){
                   console.log('body', body.Messages[i].Body)
                   dynamo.putMessage(body.Messages[i], body.Messages[i].MessageAttributes)
               }
-              io.emit('messages', body.Messages);
           }
           if (receiptHandles.length > 0) {
               sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
-                if(body.Successful){
+                if(body.Successful) {
+                  io.emit('messages', body.Messages);
                   console.log("Deletion of " + body.Successful.length + " succeeded, ");
                 }
                 if(body.Failed) {
