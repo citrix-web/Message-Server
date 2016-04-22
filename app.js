@@ -60,14 +60,14 @@ io.on('connection', function(socket){
               io.emit('messages', body.Messages);
           }
           if (receiptHandles.length > 0) {
-              // sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
-              //   if(body.Successful){
-              //     console.log("Deletion of " + body.Successful.length + " succeeded, ");
-              //   }
-              //   if(body.Failed) {
-              //     console.log("Deletion of " + body.Failed.length + " failed");
-              //   }
-              // });
+              sqs.deleteMessages(receiptHandles, queueUrl, function(e, body) {
+                if(body.Successful){
+                  console.log("Deletion of " + body.Successful.length + " succeeded, ");
+                }
+                if(body.Failed) {
+                  console.log("Deletion of " + body.Failed.length + " failed");
+                }
+              });
           }
 
         });
