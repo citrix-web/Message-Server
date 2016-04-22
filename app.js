@@ -43,7 +43,7 @@ sqs.getQueue(function(e, body) {
 });
 
 io.on('connection', function(socket){
-  console.log('a user connected');
+  console.log('user connected');
 
   setInterval(function () {
       sqs.receiveMessage(queueUrl, function(e, body) {
@@ -54,7 +54,7 @@ io.on('connection', function(socket){
           if (body.Messages && body.Messages.length > 0) {
               for (var i = 0; i < body.Messages.length; i++) {
                   receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
-                  console.log('body*****', body.Messages[i].Attributes)
+                  console.log('body', body.Messages[i].Body)
                   dynamo.putMessage(body.Messages[i], body.Messages[i].MessageAttributes)
               }
               io.emit('messages', body.Messages);
@@ -69,8 +69,7 @@ io.on('connection', function(socket){
                 }
               });
           }
-
         });
-  }, 5000);
+  }, 1500);
 
 });
