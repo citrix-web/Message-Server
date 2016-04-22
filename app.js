@@ -55,7 +55,7 @@ io.on('connection', function(socket){
               for (var i = 0; i < body.Messages.length; i++) {
                   receiptHandles.push({ Id : i.toString(), ReceiptHandle : body.Messages[i].ReceiptHandle });
                   console.log('body*****', body.Messages[i].Attributes)
-                  dynamo.putMessage(body.Messages[i])
+                  dynamo.putMessage(body.Messages[i], body.Messages[i].MessageAttributes)
               }
               io.emit('messages', body.Messages);
           }
